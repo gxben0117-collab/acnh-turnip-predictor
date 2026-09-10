@@ -1,0 +1,17 @@
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+.env.*
+dist/
+build/
+output/
+temp/
+.cache/
+.pytest_cache/
+coverage/
+.DS_Store
+Thumbs.db
+*.bak
