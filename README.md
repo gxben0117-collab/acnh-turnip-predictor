@@ -13,7 +13,10 @@
 
 ## 線上使用
 
-<!-- 部署後在這裡補上 GitHub Pages 網址 -->
+<https://gxben0117-collab.github.io/acnh-turnip-predictor/>
+
+GitHub Pages 從 `master` 分支根目錄直接服務靜態檔案（legacy 模式，無 CI 建置），所以每次改動
+`src/web/` 或 `src/engine/` 之後要記得 `npm.cmd run build` 產生新的 `app.js`，再 commit＋push。
 
 ## 本機開發
 
