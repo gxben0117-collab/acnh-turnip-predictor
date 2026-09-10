@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>大頭菜價格預測器</title>
+    <meta name="description" content="輸入本週大頭菜購入價與已知價格，用真實的價格生成演算法反推可能型態，預測未來價格區間，告訴你現在該不該賣。" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="app" id="app">
+      <header class="app-header">
+        <h1>🥬 大頭菜價格預測器</h1>
+        <p class="app-subtitle">輸入價格，排除所有不符合的可能曲線，不是用「連跌三次」用猜的</p>
+      </header>
+
+      <!-- ① 現在該不該賣 -->
+      <section class="card verdict-card" id="verdict-card" aria-live="polite">
+        <p class="verdict-placeholder">先在下方輸入本週購入價，才能開始分析。</p>
+      </section>
+
+      <!-- 警告訊息 -->
+      <div id="warnings" class="warnings" hidden></div>
+
+      <!-- ② 最可能 Pattern -->
+      <section class="card">
+        <h2>本週最可能型態</h2>
+        <div id="pattern-probabilities" class="pattern-probabilities">
+          <p class="muted">尚無資料。</p>
+        </div>
+      </section>
+
+      <!-- ③④ 最值得觀察的時段 / 預測最高價 -->
+      <section class="card" id="highlight-card" hidden>
+        <div class="highlight-grid">
+          <div>
+            <div class="highlight-label">最值得觀察</div>
+            <div class="highlight-value" id="watch-window">—</div>
+          </div>
+          <div>
+            <div class="highlight-label">預測本週可能最高</div>
+            <div class="highlight-value" id="week-max-range">—</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 🎯 出售策略摘要（含記帳） -->
+      <section class="card" id="strategy-card" hidden>
+        <h2>🎯 建議出售策略</h2>
+        <dl class="strategy-list" id="strategy-list"></dl>
+      </section>
+
+      <!-- ⑤ 詳細 Pattern probability 已併入上方 pattern-probabilities -->
+
+      <!-- ⑥ 趨勢圖 -->
+      <section class="card">
+        <h2>價格趨勢圖</h2>
+        <div id="chart-container" class="chart-container">
+          <p class="muted">輸入購入價後會顯示圖表。</p>
+        </div>
+        <p class="chart-legend">
+          <span class="legend-swatch legend-actual"></span>實際價格
+          <span class="legend-swatch legend-hp"></span>高機率範圍
+          <span class="legend-swatch legend-theoretical"></span>理論可能範圍
+          <span class="legend-swatch legend-buyline"></span>購入價基準線
+        </p>
+      </section>
+
+      <!-- 輸入區 -->
+      <section class="card">
+        <h2>本週大頭菜購入價</h2>
+        <div class="field-row">
+          <label for="buy-price">購入價（鈴錢）</label>
+          <input type="number" inputmode="numeric" id="buy-price" min="0" placeholder="例如 98" />
+        </div>
+        <div class="field-row">
+          <label for="quantity">購入數量（顆，選填，用於記帳）</label>
+          <input type="number" inputmode="numeric" id="quantity" min="0" placeholder="例如 40" />
+        </div>
+        <div class="field-row">
+          <label for="previous-pattern">知道上週價格型態嗎？</label>
+          <select id="previous-pattern">
+            <option value="">不知道</option>
+            <option value="0">波動型</option>
+            <option value="1">大漲型</option>
+            <option value="2">遞減型</option>
+            <option value="3">小漲型</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <label for="risk-profile">出售策略</label>
+          <select id="risk-profile">
+            <option value="conservative">保守</option>
+            <option value="balanced" selected>平衡</option>
+            <option value="aggressive">冒險</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>本週價格輸入</h2>
+        <div class="day-grid" id="day-grid"><!-- 由 JS 動態產生 --></div>
+      </section>
+
+      <section class="card danger-zone">
+        <button type="button" id="clear-button" class="btn btn-danger">清除本週資料</button>
+      </section>
+
+      <footer class="app-footer">
+        <p>
+          演算法來源：Ninji（Treeki）反編譯 ×
+          <a href="https://github.com/mikebryant/ac-nh-turnip-prices" target="_blank" rel="noopener">Turnip Prophet</a>
+          （Apache-2.0）。本站與任天堂無關，未使用任何官方美術素材。
+        </p>
+      </footer>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

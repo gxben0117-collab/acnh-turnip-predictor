@@ -1,0 +1,404 @@
+:root {
+  --bg: #eef7ea;
+  --card-bg: #ffffff;
+  --text: #2e3b2a;
+  --muted: #6b7a63;
+  --border: #dbeacd;
+  --accent: #5b9a5f;
+  --accent-dark: #3f7a44;
+  --brown: #a9744f;
+  --sky: #cdeaf5;
+
+  --hold: #4caf50;
+  --hold-bg: #e6f6e6;
+  --can-sell: #d8a531;
+  --can-sell-bg: #fdf3dc;
+  --should-sell: #e0812f;
+  --should-sell-bg: #fdead9;
+  --strongly-sell: #d64545;
+  --strongly-sell-bg: #fbe1e1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #16201a;
+    --card-bg: #1f2b21;
+    --text: #eaf3e6;
+    --muted: #9db096;
+    --border: #33452f;
+    --accent: #7fc784;
+    --accent-dark: #9fdc9f;
+    --sky: #1e3a45;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", "Noto Sans TC", "PingFang TC", system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px 16px 48px;
+}
+
+.app-header {
+  text-align: center;
+  padding: 12px 0 20px;
+}
+
+.app-header h1 {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+}
+
+.app-subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(60, 90, 60, 0.06);
+}
+
+.card h2 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* 出售建議卡片 */
+.verdict-card {
+  text-align: center;
+  padding: 20px 16px;
+}
+
+.verdict-placeholder {
+  margin: 0;
+  color: var(--muted);
+}
+
+.verdict-emoji {
+  font-size: 2.4rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.verdict-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.verdict-detail {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.verdict-hold {
+  background: var(--hold-bg);
+  color: var(--hold);
+}
+.verdict-canSell {
+  background: var(--can-sell-bg);
+  color: var(--can-sell);
+}
+.verdict-shouldSell {
+  background: var(--should-sell-bg);
+  color: var(--should-sell);
+}
+.verdict-stronglySell {
+  background: var(--strongly-sell-bg);
+  color: var(--strongly-sell);
+}
+
+/* 警告 */
+.warnings {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.warning-item {
+  background: #fff4e0;
+  border: 1px solid #f0c987;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .warning-item {
+    background: #3a2e15;
+    border-color: #6b551f;
+  }
+}
+
+/* Pattern 機率 */
+.pattern-probabilities {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pattern-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 56px;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.pattern-bar-track {
+  background: var(--border);
+  border-radius: 999px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.pattern-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.pattern-percent {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 最值得觀察 / 預測最高 */
+.highlight-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.highlight-label {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+
+.highlight-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* 出售策略摘要 */
+.strategy-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+  margin: 0;
+}
+
+.strategy-list dt {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.strategy-list dd {
+  margin: 2px 0 0;
+  font-weight: 700;
+}
+
+/* 圖表 */
+.chart-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.turnip-chart {
+  width: 100%;
+  height: auto;
+  min-width: 480px;
+}
+
+.chart-theoretical-band {
+  fill: var(--sky);
+  opacity: 0.6;
+}
+
+.chart-highprob-band {
+  fill: var(--accent);
+  opacity: 0.35;
+}
+
+.chart-buyline {
+  stroke: var(--brown);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+
+.chart-buyline-label {
+  fill: var(--brown);
+  font-size: 10px;
+}
+
+.chart-actual-line {
+  fill: none;
+  stroke: var(--accent-dark);
+  stroke-width: 2.5;
+}
+
+.chart-actual-dot {
+  fill: var(--accent-dark);
+}
+
+.chart-x-label {
+  fill: var(--muted);
+  font-size: 9px;
+}
+
+.chart-legend {
+  font-size: 0.75rem;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: center;
+  margin: 10px 0 0;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 3px;
+  vertical-align: middle;
+}
+.legend-actual {
+  background: var(--accent-dark);
+}
+.legend-hp {
+  background: var(--accent);
+  opacity: 0.5;
+}
+.legend-theoretical {
+  background: var(--sky);
+}
+.legend-buyline {
+  background: var(--brown);
+}
+
+/* 表單 */
+.field-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.field-row:last-child {
+  margin-bottom: 0;
+}
+
+label {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+input[type="number"],
+select {
+  font-size: 1.15rem;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 48px;
+}
+
+input[type="number"]:focus,
+select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* 每日輸入格 */
+.day-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.day-cell {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.day-cell-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.day-cell input {
+  width: 100%;
+  font-size: 1.05rem;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 44px;
+}
+
+/* 按鈕 */
+.btn {
+  font-size: 1rem;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: none;
+  min-height: 48px;
+  cursor: pointer;
+}
+
+.btn-danger {
+  background: var(--strongly-sell-bg);
+  color: var(--strongly-sell);
+  width: 100%;
+  font-weight: 600;
+}
+
+.danger-zone {
+  text-align: center;
+}
+
+.app-footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.75rem;
+  margin-top: 24px;
+}
+
+.app-footer a {
+  color: var(--accent-dark);
+}
+
+@media (min-width: 520px) {
+  .day-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
