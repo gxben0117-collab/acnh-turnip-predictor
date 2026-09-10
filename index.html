@@ -8,6 +8,14 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
+    <!-- 浮動狀態列：捲動離開上方結論卡片後自動顯示，點一下可以滑回頂端看完整結論。 -->
+    <button type="button" id="sticky-bar" class="sticky-bar" aria-hidden="true" tabindex="-1" aria-label="回到頂端看完整結論">
+      <span class="sticky-bar-emoji" id="sticky-bar-emoji">—</span>
+      <span class="sticky-bar-title" id="sticky-bar-title">—</span>
+      <span class="sticky-bar-price" id="sticky-bar-price"></span>
+      <span class="sticky-bar-hint">▲ 看詳情</span>
+    </button>
+
     <div class="app" id="app">
       <header class="app-header">
         <h1>🥬 大頭菜價格預測器</h1>

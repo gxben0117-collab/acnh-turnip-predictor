@@ -1049,7 +1049,12 @@
   var strategyList = el("strategy-list");
   var chartContainer = el("chart-container");
   var clearButton = el("clear-button");
+  var stickyBar = el("sticky-bar");
+  var stickyBarEmoji = el("sticky-bar-emoji");
+  var stickyBarTitle = el("sticky-bar-title");
+  var stickyBarPrice = el("sticky-bar-price");
   var state = loadState();
+  var currentAdvice;
   var dayInputs = /* @__PURE__ */ new Map();
   function buildDayGrid() {
     dayGrid.innerHTML = "";
@@ -1159,6 +1164,41 @@
     verdictCard.appendChild(title);
     verdictCard.appendChild(detail);
   }
+  function renderStickyBar(advice) {
+    stickyBar.classList.remove(...Object.values(VERDICT_META).map((m) => m.className.replace("verdict-", "sticky-bar-")));
+    if (!advice) {
+      stickyBarEmoji.textContent = "\u2014";
+      stickyBarTitle.textContent = "\u5C1A\u7121\u8CC7\u6599";
+      stickyBarPrice.textContent = "";
+      return;
+    }
+    const meta = VERDICT_META[advice.level];
+    stickyBar.classList.add(`sticky-bar-${advice.level}`);
+    stickyBarEmoji.textContent = meta.emoji;
+    stickyBarTitle.textContent = meta.title;
+    stickyBarPrice.textContent = `\u76EE\u524D ${formatBells(advice.currentPrice)}`;
+  }
+  function setStickyBarVisible(visible) {
+    const shouldShow = visible && currentAdvice !== void 0;
+    stickyBar.classList.toggle("visible", shouldShow);
+    stickyBar.setAttribute("aria-hidden", shouldShow ? "false" : "true");
+    stickyBar.tabIndex = shouldShow ? 0 : -1;
+    document.body.classList.toggle("sticky-active", shouldShow);
+  }
+  function setupStickyBar() {
+    stickyBar.addEventListener("click", () => {
+      setStickyBarVisible(false);
+      verdictCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    document.body.style.setProperty("--sticky-bar-height", `${stickyBar.getBoundingClientRect().height || 46}px`);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setStickyBarVisible(entry ? !entry.isIntersecting : false);
+      },
+      { threshold: 0 }
+    );
+    observer.observe(verdictCard);
+  }
   function renderWarnings(warnings) {
     warningsContainer.innerHTML = "";
     if (warnings.length === 0) {
@@ -1254,7 +1294,10 @@
   }
   function recompute() {
     if (state.buyPrice === void 0 || Number.isNaN(state.buyPrice) || state.buyPrice <= 0) {
+      currentAdvice = void 0;
       renderVerdict(void 0);
+      renderStickyBar(void 0);
+      setStickyBarVisible(false);
       renderPatternProbabilities(void 0);
       highlightCard.hidden = true;
       strategyCard.hidden = true;
@@ -1272,8 +1315,10 @@
     const totals = summarizePatternProbabilities(result);
     const weekPrices = buildWeekPriceArray(state.buyPrice, state.dayPrices);
     const advice = computeSellAdvice(result, weekPrices, state.riskProfile);
+    currentAdvice = advice;
     renderPatternProbabilities(totals);
     renderVerdict(advice);
+    renderStickyBar(advice);
     if (advice) {
       renderHighlights(candidates, advice, aggregate);
       renderStrategy(advice);
@@ -1325,6 +1370,7 @@
     buildDayGrid();
     applyStateToForm();
     wireEvents();
+    setupStickyBar();
     recompute();
   }
   init();

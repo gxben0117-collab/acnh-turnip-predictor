@@ -49,6 +49,81 @@ body {
   padding: 16px 16px 48px;
 }
 
+/* 浮動狀態列：捲動離開頂端結論卡片後貼在畫面最上方，不用滑回頂端就能看到結論。 */
+.sticky-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  border: none;
+  border-bottom: 1px solid var(--border);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--card-bg);
+  box-shadow: 0 2px 10px rgba(30, 40, 30, 0.15);
+  cursor: pointer;
+  text-align: left;
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+  pointer-events: none;
+}
+
+.sticky-bar.visible {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sticky-bar-emoji {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.sticky-bar-title {
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.sticky-bar-price {
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sticky-bar-hint {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.sticky-bar-hold {
+  background: var(--hold-bg);
+}
+.sticky-bar-canSell {
+  background: var(--can-sell-bg);
+}
+.sticky-bar-shouldSell {
+  background: var(--should-sell-bg);
+}
+.sticky-bar-stronglySell {
+  background: var(--strongly-sell-bg);
+}
+
+body.sticky-active {
+  padding-top: var(--sticky-bar-height, 46px);
+}
+
 .app-header {
   text-align: center;
   padding: 12px 0 20px;

@@ -79,8 +79,13 @@ const strategyCard = el<HTMLDivElement>("strategy-card");
 const strategyList = el<HTMLDivElement>("strategy-list");
 const chartContainer = el<HTMLDivElement>("chart-container");
 const clearButton = el<HTMLButtonElement>("clear-button");
+const stickyBar = el<HTMLButtonElement>("sticky-bar");
+const stickyBarEmoji = el<HTMLSpanElement>("sticky-bar-emoji");
+const stickyBarTitle = el<HTMLSpanElement>("sticky-bar-title");
+const stickyBarPrice = el<HTMLSpanElement>("sticky-bar-price");
 
 let state: AppState = loadState();
+let currentAdvice: SellAdvice | undefined;
 
 const dayInputs = new Map<DaySlotKey, HTMLInputElement>();
 
@@ -212,6 +217,55 @@ function renderVerdict(advice: SellAdvice | undefined): void {
   verdictCard.appendChild(detail);
 }
 
+/**
+ * 浮動狀態列的內容：更新文字，但顯示/隱藏由 IntersectionObserver（見 setupStickyBar）
+ * 依「頂端結論卡片是否還在畫面內」決定，跟這裡的內容更新分開處理。
+ */
+function renderStickyBar(advice: SellAdvice | undefined): void {
+  stickyBar.classList.remove(...Object.values(VERDICT_META).map((m) => m.className.replace("verdict-", "sticky-bar-")));
+
+  if (!advice) {
+    stickyBarEmoji.textContent = "—";
+    stickyBarTitle.textContent = "尚無資料";
+    stickyBarPrice.textContent = "";
+    return;
+  }
+
+  const meta = VERDICT_META[advice.level];
+  stickyBar.classList.add(`sticky-bar-${advice.level}`);
+  stickyBarEmoji.textContent = meta.emoji;
+  stickyBarTitle.textContent = meta.title;
+  stickyBarPrice.textContent = `目前 ${formatBells(advice.currentPrice)}`;
+}
+
+function setStickyBarVisible(visible: boolean): void {
+  const shouldShow = visible && currentAdvice !== undefined;
+  stickyBar.classList.toggle("visible", shouldShow);
+  stickyBar.setAttribute("aria-hidden", shouldShow ? "false" : "true");
+  stickyBar.tabIndex = shouldShow ? 0 : -1;
+  document.body.classList.toggle("sticky-active", shouldShow);
+}
+
+function setupStickyBar(): void {
+  stickyBar.addEventListener("click", () => {
+    // 先把浮動列收起來（同步移除 body 的 padding-top 補償），再開始捲動，
+    // 避免捲動動畫進行到一半時版面高度突然變化，導致捲過頭、結論卡片被蓋住一截。
+    setStickyBarVisible(false);
+    verdictCard.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  // 量測浮動列實際高度，讓捲動時內容不會被蓋住（不同裝置的瀏海/安全區高度不同）。
+  document.body.style.setProperty("--sticky-bar-height", `${stickyBar.getBoundingClientRect().height || 46}px`);
+
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      setStickyBarVisible(entry ? !entry.isIntersecting : false);
+    },
+    { threshold: 0 },
+  );
+  observer.observe(verdictCard);
+}
+
 function renderWarnings(warnings: ReturnType<typeof computeWarnings>): void {
   warningsContainer.innerHTML = "";
   if (warnings.length === 0) {
@@ -327,7 +381,10 @@ function renderChart(candidates: PatternPossibility[], aggregate: PatternPossibi
 
 function recompute(): void {
   if (state.buyPrice === undefined || Number.isNaN(state.buyPrice) || state.buyPrice <= 0) {
+    currentAdvice = undefined;
     renderVerdict(undefined);
+    renderStickyBar(undefined);
+    setStickyBarVisible(false);
     renderPatternProbabilities(undefined);
     highlightCard.hidden = true;
     strategyCard.hidden = true;
@@ -347,9 +404,11 @@ function recompute(): void {
 
   const weekPrices = buildWeekPriceArray(state.buyPrice, state.dayPrices);
   const advice = computeSellAdvice(result, weekPrices, state.riskProfile);
+  currentAdvice = advice;
 
   renderPatternProbabilities(totals);
   renderVerdict(advice);
+  renderStickyBar(advice);
 
   if (advice) {
     renderHighlights(candidates, advice, aggregate);
@@ -410,6 +469,7 @@ function init(): void {
   buildDayGrid();
   applyStateToForm();
   wireEvents();
+  setupStickyBar();
   recompute();
 }
 
